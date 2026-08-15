@@ -1,16 +1,19 @@
 package com.mobin.booknetworkapi.user;
 
 import com.mobin.booknetworkapi.common.BaseAuditingEntity;
+import com.mobin.booknetworkapi.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.security.auth.Subject;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -31,6 +34,8 @@ public class User extends BaseAuditingEntity implements UserDetails, Principal{
     private String password;
     private boolean accountLocked;
     private boolean enabled;
+    @ManyToMany(fetch =FetchType.EAGER)
+    private List<Role> roles;
     @Override
     public String getName() {
         return "";
@@ -43,7 +48,10 @@ public class User extends BaseAuditingEntity implements UserDetails, Principal{
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return this.roles
+                .stream()
+                .map(r-> new SimpleGrantedAuthority(r.getName()))
+                .collect(Collectors.toList());
     }
 
     @Override
