@@ -28,3 +28,8 @@ spring:
             connectiontimeout: 5000
             timeout: 3000
             writetimeout: 5000
+application:
+  security:
+    jwt:
+      secret-key: 2RQbyf}Wv@NSTdT!&bh{CJRg(z=$3OoT].|e#[%(p@/
+      expiration: 8640000
