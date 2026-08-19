@@ -21,12 +21,7 @@ public class SecurityConfig {
     private final JwtFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private static final String[] WHITE_LIST_URL = {
-            "/api/v1/auth/**",
-            "/api/v1/admin/register",
-            "/api/v1/product",
-            "/api/v1/admin/login",
-            "/v1/api-docs",
-            "/v2/api-docs",
+            "/auth/**",
             "/v3/api-docs",
             "/v3/api-docs/**",
             "/swagger-resources",
@@ -35,7 +30,7 @@ public class SecurityConfig {
             "/configuration/security",
             "/swagger-ui/**",
             "/webjars/**",
-            "/api/v1/auth/activate/**",
+            "/ws/**",
             "/swagger-ui.html"
     };
     @Bean

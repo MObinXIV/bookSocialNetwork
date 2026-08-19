@@ -1,17 +1,21 @@
 package com.mobin.booknetworkapi.authentication;
-
+import com.mobin.booknetworkapi.email.EmailService;
 import com.mobin.booknetworkapi.role.RoleRepository;
 import com.mobin.booknetworkapi.user.Token;
 import com.mobin.booknetworkapi.user.TokenRepository;
 import com.mobin.booknetworkapi.user.User;
 import com.mobin.booknetworkapi.user.UserRepository;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.mobin.booknetworkapi.email.EmailTemplateName.*;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +24,11 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
-    public void register(RegistrationRequest request) {
+    private final EmailService emailService;
+    @Value("${application.mailing.frontend.activation-url}")
+    private String activationUrl;
+
+    public void register(RegistrationRequest request) throws MessagingException {
         // get the user role
         var userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new IllegalStateException("User role not found"));
@@ -38,9 +46,16 @@ public class AuthenticationService {
         sendValidationEmail(user);
     }
 
-    private void sendValidationEmail(User user) {
+    private void sendValidationEmail(User user) throws MessagingException {
         var newToken = generateAndSaveActivationToken(user);
-        // send email
+        emailService.sendEmail(
+                user.getEmail(),
+                user.getFullName(),
+                ACTIVATE_ACCOUNT,
+                activationUrl,
+                newToken,
+                "Account Activation"
+        );
     }
 
     private String generateAndSaveActivationToken(User user) {

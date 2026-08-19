@@ -28,7 +28,7 @@ public class User extends BaseAuditingEntity implements UserDetails, Principal{
     private Integer id;
     private String firstName;
     private String lastName;
-    private String dataOfBirth;
+    private String dateOfBirth;
     @Column(unique = true)
     private String email;
     private String password;
@@ -38,7 +38,7 @@ public class User extends BaseAuditingEntity implements UserDetails, Principal{
     private List<Role> roles;
     @Override
     public String getName() {
-        return "";
+        return email;
     }
 
     @Override
