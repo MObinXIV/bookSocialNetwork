@@ -11,7 +11,7 @@ services:
     volumes:
       - postgres:/data/postgres
     ports:
-      - 5432:5431
+      - 5433:5432
     networks:
       - spring-demo
     restart: unless-stopped
