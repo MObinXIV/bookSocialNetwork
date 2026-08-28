@@ -5,12 +5,13 @@ import com.mobin.booknetworkapi.common.BaseAuditingEntity;
 import com.mobin.booknetworkapi.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity

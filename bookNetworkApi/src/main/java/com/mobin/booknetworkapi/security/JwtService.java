@@ -60,6 +60,7 @@ public class JwtService {
                 .toList();
         return Jwts
                 .builder()
+                .setHeaderParam("typ", "JWT")
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
