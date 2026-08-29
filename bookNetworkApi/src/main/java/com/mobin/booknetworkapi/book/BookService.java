@@ -1,6 +1,7 @@
 package com.mobin.booknetworkapi.book;
 
 import com.mobin.booknetworkapi.common.PageResponse;
+import com.mobin.booknetworkapi.exception.OperationNotPermittedException;
 import com.mobin.booknetworkapi.history.BookTransactionHistory;
 import com.mobin.booknetworkapi.history.BookTransactionHistoryRepository;
 import com.mobin.booknetworkapi.user.User;
@@ -14,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.mobin.booknetworkapi.book.BookSpecification.withOwner;
@@ -107,5 +109,17 @@ public class BookService {
                 allBorrowedBooks.isFirst(),
                 allBorrowedBooks.isLast()
         );
+    }
+
+    public Integer updateShareableStatus(Integer bookId, Authentication connectedUser) {
+        Book book = bookRepository.findById(bookId).orElseThrow(()-> new EntityNotFoundException("Book not found with ID: "+bookId));
+        User user = ((User) connectedUser.getPrincipal());
+        // check if the current user the owner of the book or not , as if he 's not we 'll disallow him
+        if(!Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotPermittedException("You cannot update shareable status");
+        }
+        book.setShareable(!book.isShareable());
+        bookRepository.save(book);
+        return bookId;
     }
 }
