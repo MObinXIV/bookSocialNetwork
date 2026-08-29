@@ -1,4 +1,4 @@
-package feedback;
+package com.mobin.booknetworkapi.feedback;
 
 import com.mobin.booknetworkapi.book.Book;
 import com.mobin.booknetworkapi.common.BaseAuditingEntity;
