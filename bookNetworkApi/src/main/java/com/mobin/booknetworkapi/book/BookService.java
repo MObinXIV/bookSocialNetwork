@@ -2,6 +2,7 @@ package com.mobin.booknetworkapi.book;
 
 import com.mobin.booknetworkapi.common.PageResponse;
 import com.mobin.booknetworkapi.exception.OperationNotPermittedException;
+import com.mobin.booknetworkapi.file.FileStorageService;
 import com.mobin.booknetworkapi.history.BookTransactionHistory;
 import com.mobin.booknetworkapi.history.BookTransactionHistoryRepository;
 import com.mobin.booknetworkapi.user.User;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
@@ -26,6 +28,7 @@ public class BookService {
     private final BookMapper bookMapper;
     private final BookRepository bookRepository;
     private final BookTransactionHistoryRepository historyRepository;
+    private final FileStorageService fileStorageService;
     public Integer save(BookRequest request,Authentication connectedUser) {
         User user = ((User) connectedUser.getPrincipal());
         Book book= bookMapper.toBook(request);
@@ -196,5 +199,16 @@ public class BookService {
                 .orElseThrow(()-> new OperationNotPermittedException("The book isn't returned yet, you can't approve its return"));
         transactionHistory.setReturnApproved(true);
         return historyRepository.save(transactionHistory).getId();
+    }
+
+    public void uploadBookCoverPicture(MultipartFile file, Authentication connectedUser, Integer bookId) {
+        Book book = bookRepository.findById(bookId).orElseThrow(()-> new EntityNotFoundException("Book not found with ID: "+bookId));
+        User user = ((User) connectedUser.getPrincipal());
+        if (!Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotPermittedException("You cannot update others' books cover picture");
+        }
+        var bookCover = fileStorageService.saveFile(file,user.getId()); // upload the file in the server for specific user
+        book.setBookCover(bookCover);
+        bookRepository.save(book);
     }
 }
