@@ -1,5 +1,6 @@
 package com.mobin.booknetworkapi.book;
 
+import com.mobin.booknetworkapi.file.FileUtils;
 import com.mobin.booknetworkapi.history.BookTransactionHistory;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +28,7 @@ public class BookMapper {
                 .rate(book.getRate())
                 .archived(book.isArchived())
                 .owner(book.getOwner().getFullName())
-                //todo
-                //.cover()
+                .cover(FileUtils.readFileFromLocation(book.getBookCover()))
                 .build();
     }
 
