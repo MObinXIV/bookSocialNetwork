@@ -16,9 +16,6 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 public class Role extends BaseAuditingEntity {
-    @Id
-    @GeneratedValue
-    private Integer id;
     @Column(unique = true)
     private String name;
     // establish the relation between user & roles
