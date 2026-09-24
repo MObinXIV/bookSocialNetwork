@@ -22,6 +22,7 @@ import static io.swagger.v3.oas.annotations.enums.SecuritySchemeType.*;
                 ),
                 description = "OpenApi doc for spring boot",
                 title = "OpenApi Documentation - M0bin",
+                version = "1.0",
                 license = @License(
                         name = "License name",
                         url = "https://some-url.com"

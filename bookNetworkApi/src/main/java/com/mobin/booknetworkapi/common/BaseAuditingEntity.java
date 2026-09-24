@@ -32,7 +32,7 @@ public class BaseAuditingEntity {
     @Column(name = "last_modified_date",insertable = false)
     private LocalDateTime updatedDate;
     @CreatedBy
-    @Column(name = "created_by",nullable = false,updatable = false)
+    @Column(name = "created_by",updatable = false)
     private Integer createdBy;
     @LastModifiedBy
     @Column(name = "last_modified_by", insertable = false)
