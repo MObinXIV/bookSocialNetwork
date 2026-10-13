@@ -50,7 +50,7 @@ Activation emails show up in MailDev at `http://localhost:<maildev-port>`.
 For the frontend:
 
 ```bash
-cd <frontend-folder>
+cd book-network-ui
 npm install
 ng serve
 ```
