@@ -1,58 +1,140 @@
-<div class="p-2">
-  <h2>Manage my book</h2>
-  <hr>
-  @if(errorMsg.length){
-    <div class="alert alert-danger mt-2"role="alert">
+<section class="manage-book-page">
+  <header class="page-heading">
+    <div>
+      <p class="eyebrow">YOUR LIBRARY</p>
+      <h1>{{ isEditMode ? 'Edit book' : 'Add a book' }}</h1>
+      <p class="text-secondary mb-0">
+        {{ isEditMode ? 'Update the details of your book.' : 'Share a favorite with the Book Social Network community.' }}
+      </p>
+    </div>
+    <a routerLink="/books/my-books" class="btn btn-outline-secondary">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      <span>Back to my books</span>
+    </a>
+  </header>
+
+  @if (errorMsg.length) {
+    <div class="alert alert-danger" role="alert">
       @for (msg of errorMsg; track msg) {
-        <p class="p-0 m-0">{{ msg }}</p>
+        <p class="mb-0">{{ msg }}</p>
       }
     </div>
   }
-  <div class="d-flex gap-2">
-    <div class="col-3">
-      <img class="rounded-1" width="100%" height="100%" [src]="selectedPicture|| 'https://placehold.co/200x300?text=No+Cover'" alt="...">
-      <div class="mt-2">
-        <input
-          (change)="onfileSelected($event)"
+
+  @if (isLoading) {
+    <div class="loading-state" role="status">
+      <span class="spinner-border text-primary" aria-hidden="true"></span>
+      <span>Loading book details…</span>
+    </div>
+  } @else if (!isEditMode || isBookLoaded) {
+  <div class="manage-book-layout">
+    <aside class="cover-panel">
+      <img
+        class="cover-preview"
+        [src]="selectedPicture || 'https://placehold.co/400x560?text=Book+Cover'"
+        alt="Preview of the selected book cover"
+      >
+      <label for="bookCover" class="form-label fw-semibold">Book cover</label>
+      <input
+        (change)="onFileSelected($event)"
         class="form-control"
         type="file"
-        id="formFile"
+        id="bookCover"
         accept="image/*"
+        aria-describedby="coverHelp"
+      >
+      <small id="coverHelp" class="form-text">
+        {{ isEditMode ? 'Choose a new image to replace the current cover, or leave unchanged.' : 'Choose an image file, or add a cover later.' }}
+      </small>
+    </aside>
+
+    <form class="book-form" #bookForm="ngForm" (ngSubmit)="saveBook()">
+      <div class="form-field">
+        <label for="title" class="form-label">Book title</label>
+        <input
+          [(ngModel)]="bookRequest.title"
+          name="title"
+          type="text"
+          class="form-control"
+          id="title"
+          placeholder="e.g. The Midnight Library"
+          required
         >
       </div>
-    </div>
-    <div class="col-9">
-      <form class="row">
-        <div class="col-12">
-          <label for="title" class="form-label">Title</label>
-          <input [(ngModel)]="bookRequest.title" name="title" type="text" class="form-control" id="title" placeholder="Book title">
+      <div class="form-row">
+        <div class="form-field">
+          <label for="author" class="form-label">Author</label>
+          <input
+            [(ngModel)]="bookRequest.authorName"
+            name="authorName"
+            type="text"
+            class="form-control"
+            id="author"
+            placeholder="Author name"
+            required
+          >
         </div>
-        <div class="col-6">
-          <label for="author" class="form-label">Author name</label>
-          <input [(ngModel)]="bookRequest.authorName" name="authorName" type="text" class="form-control" id="author" placeholder="Author name">
-        </div>
-        <div class="col-6">
+        <div class="form-field">
           <label for="isbn" class="form-label">ISBN</label>
-          <input [(ngModel)]="bookRequest.isbn" name="isbn" type="text" class="form-control" id="isbn" placeholder="ISBN">
+          <input
+            [(ngModel)]="bookRequest.isbn"
+            name="isbn"
+            type="text"
+            class="form-control"
+            id="isbn"
+            placeholder="ISBN"
+            required
+          >
         </div>
-        <div class="col-12">
-          <label for="synopsis" class="form-label">Synopsis</label>
-          <textarea [(ngModel)]="bookRequest.synopsis" name="synopsis" rows="4" class="form-control" id="synopsis" placeholder="Synopsis"></textarea>
-        </div>
-        <div class="col-12">
-          <input [(ngModel)]="bookRequest.shareable" name="shareable" class="form-check-input" type="checkbox" id="shareme">
-          <label for="shareme" class="form-check-label">Share me</label>
-        </div>
-        <div class="d-flex justify-content-end gap-2 col-12">
-          <button (click)="saveBook()" type="submit" class="btn btn-outline-primary">
-            <i class="fas fa-save"></i>&nbsp;Save
-          </button>
-          <a routerLink="/books/my-books" class="btn btn-link text-danger">
-            <i class="fas fa-times"></i>&nbsp;Cancel
-          </a>
-        </div>
-      </form>
-    </div>
+      </div>
+      <div class="form-field">
+        <label for="synopsis" class="form-label">Synopsis</label>
+        <textarea
+          [(ngModel)]="bookRequest.synopsis"
+          name="synopsis"
+          rows="6"
+          class="form-control"
+          id="synopsis"
+          placeholder="What is this book about?"
+          required
+        ></textarea>
+      </div>
+      <label for="shareable" class="sharing-option">
+        <input
+          [(ngModel)]="bookRequest.shareable"
+          name="shareable"
+          class="form-check-input"
+          type="checkbox"
+          id="shareable"
+        >
+        <span>
+          <span class="fw-semibold d-block">Make this book available to borrow</span>
+          <span class="text-secondary">You can change this setting any time.</span>
+        </span>
+      </label>
+      <div class="form-actions">
+        <a routerLink="/books/my-books" class="btn btn-link text-secondary">
+          {{ bookSaved && selectedBookCover ? 'Continue without cover' : 'Cancel' }}
+        </a>
+        <button [disabled]="bookForm.invalid || isSaving" type="submit" class="btn btn-primary">
+          @if (isSaving) {
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            <span>Saving…</span>
+          } @else {
+            <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+            <span>
+              @if (bookSaved && selectedBookCover) {
+                Save changes &amp; retry cover
+              } @else if (bookSaved) {
+                Save changes &amp; continue
+              } @else {
+                {{ isEditMode ? 'Save changes' : 'Save book' }}
+              }
+            </span>
+          }
+        </button>
+      </div>
+    </form>
   </div>
-
-</div>
+  }
+</section>

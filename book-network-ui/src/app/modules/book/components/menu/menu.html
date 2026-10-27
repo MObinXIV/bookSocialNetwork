@@ -1,48 +1,56 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
+<nav class="navbar navbar-expand-lg book-navbar">
   <div class="container-fluid">
-    <a class="navbar-brand" href="javascript:void(0) ">BSN</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-    aria-expanded="false" aria-label="Toggle navigation"
+    <a class="navbar-brand" routerLink="/books" (click)="closeMenu()">
+      <span class="brand-mark"><i class="fa-solid fa-book-open" aria-hidden="true"></i></span>
+      <span>Book Social Network</span>
+    </a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      (click)="isMenuExpanded = !isMenuExpanded"
+      [attr.aria-expanded]="isMenuExpanded"
+      aria-controls="bookNavbarContent"
+      aria-label="Toggle navigation"
     >
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    <div class="collapse navbar-collapse" [class.show]="isMenuExpanded" id="bookNavbarContent">
+      <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link" aria-current="page" routerLink="/books">
-            <i class="fas fa-home-alt"></i>&nbsp;Home
+          <a
+            class="nav-link"
+            routerLink="/books"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            (click)="closeMenu()"
+          >
+            <i class="fas fa-home-alt" aria-hidden="true"></i><span>Discover</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="my-books">
-            <i class="fas fa-book"></i>&nbsp;My books
+          <a class="nav-link" routerLink="/books/my-books" routerLinkActive="active" (click)="closeMenu()">
+            <i class="fas fa-book" aria-hidden="true"></i><span>My books</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="my-waiting-list">
-            <i class="fas fa-heart"></i>&nbsp;My waiting list
+          <a class="nav-link" routerLink="/books/my-returned-books" routerLinkActive="active" (click)="closeMenu()">
+            <i class="fa-solid fa-truck-fast" aria-hidden="true"></i><span>Returned books</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="my-returned-books">
-            <i class="fa-solid fa-truck-fast"></i>&nbsp;My returned books
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="my-borrowed-books">
-            <i class="fas fa-list-check"></i>&nbsp;Borrowed books
+          <a class="nav-link" routerLink="/books/my-borrowed-books" routerLinkActive="active" (click)="closeMenu()">
+            <i class="fas fa-list-check" aria-hidden="true"></i><span>Borrowed books</span>
           </a>
         </li>
       </ul>
-      <form class="d-flex gap-2 align-items-center" role="search">
-        <input class="form-control" type="search" placeholder="Find a book" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit"><i class="fas fa-search"></i></button>
-        <span>Welcome</span>
-        <span class="text-capitalize fw-bold">Mohamed</span>
-        <button class="btn btn-link" type="submit" (click)="logout()"><i class="fas fa-door-open"></i></button>
-      </form>
+      <div class="navbar-note">
+        <i class="fa-solid fa-bookmark" aria-hidden="true"></i>
+        <span>Read. Share. Discover.</span>
+      </div>
+      <button type="button" class="btn btn-outline-secondary ms-lg-3" (click)="logout()">
+        <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+        <span class="ms-2">Sign out</span>
+      </button>
     </div>
   </div>
-
 </nav>

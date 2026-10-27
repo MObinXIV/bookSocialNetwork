@@ -7,7 +7,11 @@ export class TokenService {
   set token(token: string) {
     localStorage.setItem('token', token);
   }
-  get token(){
-    return localStorage.getItem('token') as string;
+  get token(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  clear(): void {
+    localStorage.removeItem('token');
   }
 }

@@ -12,8 +12,9 @@ import {Rating} from '../rating/rating';
 })
 export class BookCard {
   private _book: BookResponse = {};
-  private _bookCover: string | undefined;
   private _manage = false;
+  @Input() isBorrowPending = false;
+  @Input() isBorrowed = false;
   get manage(): boolean {
     return this._manage;
   }
@@ -29,14 +30,12 @@ export class BookCard {
 
 
   get bookCover(): string | undefined {
-    if(this._bookCover){
-      return 'data:image/jpg;base64,' + this._bookCover;
-    }
-    return 'https://placehold.co/200x300?text=No+Cover';
+    return this._book.cover
+      ? `data:image/jpeg;base64,${this._book.cover}`
+      : 'https://placehold.co/400x560?text=Book+Cover';
   }
   @Output() private share: EventEmitter<BookResponse> = new EventEmitter<BookResponse>();
   @Output() private archive: EventEmitter<BookResponse> = new EventEmitter<BookResponse>();
-  @Output() private addToWaitingList: EventEmitter<BookResponse> = new EventEmitter<BookResponse>();
   @Output() private borrow: EventEmitter<BookResponse> = new EventEmitter<BookResponse>();
   @Output() private edit: EventEmitter<BookResponse> = new EventEmitter<BookResponse>();
   @Output() private details: EventEmitter<BookResponse> = new EventEmitter<BookResponse>();
@@ -46,10 +45,6 @@ export class BookCard {
 
   onBorrow() {
     this.borrow.emit(this._book);
-  }
-
-  onAddToWaitingList() {
-    this.addToWaitingList.emit(this._book);
   }
 
   onEdit() {

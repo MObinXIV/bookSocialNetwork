@@ -1,31 +1,29 @@
-import {Component, OnInit} from '@angular/core';
-import {RouterLink} from '@angular/router';
+import { Component } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { TokenService } from '../../../../services/token/token.service';
 
 @Component({
   selector: 'app-menu',
-  imports: [
-    RouterLink
-  ],
+  imports: [RouterLink, RouterLinkActive],
   templateUrl: './menu.html',
   styleUrl: './menu.scss',
   standalone: true
 })
-export class Menu implements OnInit{
+export class Menu {
+  isMenuExpanded = false;
 
-  ngOnInit(): void {
-    const linkColor = document.querySelectorAll('.nav-link');
-    linkColor.forEach(link => {
-      if (window.location.href.endsWith(link.getAttribute('href') || '')) {
-        link.classList.add('active');
-      }
-      link.addEventListener('click', () => {
-        linkColor.forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-      });
-    });
-  }
-  logout() {
+  constructor(
+    private tokenService: TokenService,
+    private router: Router
+  ) {}
 
+  closeMenu(): void {
+    this.isMenuExpanded = false;
   }
 
+  logout(): void {
+    this.tokenService.clear();
+    this.closeMenu();
+    this.router.navigate(['/login']);
+  }
 }

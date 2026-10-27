@@ -1,4 +1,4 @@
-<div class="container-fluid card login-container">
+<form class="container-fluid card login-container" (ngSubmit)="login()">
   <h3 class="text-center">Login</h3>
   <hr>
   @if (errorMsg.length) {
@@ -10,15 +10,19 @@
   }
   <div class="mb-3">
     <label for="login" class="form-label">Email address</label>
-    <input [(ngModel)]="authRequest.email" type="email" class="form-control" id="login" placeholder="name@example.com">
+    <input [(ngModel)]="authRequest.email" name="email" type="email" class="form-control" id="login" placeholder="name@example.com" required>
   </div>
   <div class="mb-3">
     <label for="password" class="form-label">Password</label>
-    <input [(ngModel)]="authRequest.password" type="password" class="form-control" id="password" placeholder="Password">
+    <input [(ngModel)]="authRequest.password" name="password" type="password" class="form-control" id="password" placeholder="Password" required>
   </div>
   <div class="d-flex justify-content-between mb-3">
-    <button (click)="login()" type="button" class="btn btn-primary">
-      <em class="fas fa-sign-in-alt"></em>&nbsp;Sign in
+    <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">
+      @if (isSubmitting) {
+        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>&nbsp;Signing in…
+      } @else {
+        <em class="fas fa-sign-in-alt"></em>&nbsp;Sign in
+      }
     </button>
     <div>
       Don't have an account?&nbsp;
@@ -27,4 +31,4 @@
       </button>
     </div>
   </div>
-</div>
+</form>

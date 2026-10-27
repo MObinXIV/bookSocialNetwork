@@ -1,4 +1,4 @@
-<div class="container-fluid card login-container">
+<form class="container-fluid card login-container" (ngSubmit)="register()">
   <h3 class="text-center">Create an account</h3>
   <hr>
   @if (errorMsg.length) {
@@ -10,23 +10,27 @@
   }
   <div class="mb-3">
     <label for="firstname" class="form-label">Firstname</label>
-    <input [(ngModel)]="registerRequest.firstName" type="text" class="form-control" id="firstname" placeholder="John">
+    <input [(ngModel)]="registerRequest.firstName" name="firstName" type="text" class="form-control" id="firstname" placeholder="John" required>
   </div>
   <div class="mb-3">
     <label for="lastname" class="form-label">Lastname</label>
-    <input [(ngModel)]="registerRequest.lastName" type="text" class="form-control" id="lastname" placeholder="Doe">
+    <input [(ngModel)]="registerRequest.lastName" name="lastName" type="text" class="form-control" id="lastname" placeholder="Doe" required>
   </div>
   <div class="mb-3">
     <label for="login" class="form-label">Email address</label>
-    <input [(ngModel)]="registerRequest.email" type="email" class="form-control" id="login" placeholder="name@example.com">
+    <input [(ngModel)]="registerRequest.email" name="email" type="email" class="form-control" id="login" placeholder="name@example.com" required>
   </div>
   <div class="mb-3">
     <label for="password" class="form-label">Password</label>
-    <input [(ngModel)]="registerRequest.password" type="password" class="form-control" id="password" placeholder="Password">
+    <input [(ngModel)]="registerRequest.password" name="password" type="password" class="form-control" id="password" placeholder="Password" required>
   </div>
   <div class="d-flex justify-content-between mb-3">
-    <button (click)="register()" type="button" class="btn btn-primary">
-      <em class="fas fa-sign-in-alt"></em>&nbsp;Create an Account
+    <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">
+      @if (isSubmitting) {
+        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>&nbsp;Creating account…
+      } @else {
+        <em class="fas fa-user-plus"></em>&nbsp;Create an Account
+      }
     </button>
     <div>
       Already have an account?&nbsp;
@@ -35,4 +39,4 @@
       </button>
     </div>
   </div>
-</div>
+</form>

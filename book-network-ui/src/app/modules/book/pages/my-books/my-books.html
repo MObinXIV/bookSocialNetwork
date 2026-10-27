@@ -1,77 +1,68 @@
-<h3>My Books list</h3>
-<hr>
-<div class="d-flex justify-content-end mb-3">
-  <a routerLink="/books/manage" class="btn btn-outline-primary">
-    <i class="fas fa-plus"></i>&nbsp;New book
+<header class="my-books-heading">
+  <div>
+    <p class="eyebrow">YOUR COLLECTION</p>
+    <h1>My books</h1>
+    <p class="text-secondary mb-0">Manage the books you've shared with the community.</p>
+  </div>
+  <a routerLink="/books/manage" class="btn btn-primary">
+    <i class="fas fa-plus" aria-hidden="true"></i><span>Add a book</span>
   </a>
-</div>
-<div class="d-flex justify-content-start gap-2 flex-wrap">
-  @for (book of bookResponse.content; track book.id){
-    <app-book-card [book]="book"
-                   [manage]="true"
-                   (archive)="archiveBook($event)"
-                   (share)="shareBook($event)"
-                   (edit)="editBook($event)"
-    ></app-book-card>
-  }
-</div>
-<div class="d-flex justify-content-center mt-3">
-  <nav aria-label="Page navigation example">
-    <ul class="pagination">
-      <li class="page-item">
-        <a
-          (click)="goToFirstPage()"
-          class="page-link"
-          href="javascript:void(0)"
-          aria-label="Previous"
-          [class.disabled]="page === 0"
-        >
-          <i class="fa-solid fa-angles-left"></i>
-        </a>
-      </li>
-      <li class="page-item">
-        <a
-          (click)="goToPreviousPage()"
-          class="page-link"
-          href="javascript:void(0)"
-          aria-label="Previous"
-          [class.disabled]="page === 0"
-        >
-          <i class="fa-solid fa-angle-left"></i>
-        </a>
-      </li>
-      @for (_ of [].constructor(bookResponse.totalPages); track $index) {
+</header>
+@if (message) {
+  <div class="alert" [class.alert-danger]="messageLevel === 'error'" [class.alert-success]="messageLevel === 'success'" role="alert">
+    {{ message }}
+  </div>
+}
+@if (bookResponse.content?.length) {
+  <div class="book-grid">
+    @for (book of bookResponse.content; track book.id) {
+      <app-book-card
+        [book]="book"
+        [manage]="true"
+        (archive)="archiveBook($event)"
+        (share)="shareBook($event)"
+        (edit)="editBook($event)"
+      ></app-book-card>
+    }
+  </div>
+  <div class="d-flex justify-content-center mt-3">
+    <nav aria-label="My books pages">
+      <ul class="pagination">
         <li class="page-item">
-          <a
-            (click)="gotToPage($index)"
-            class="page-link"
-            [class.active]="page === $index"
-            href="javascript:void(0)"
-          >{{ $index + 1 }}</a>
+          <button (click)="goToFirstPage()" class="page-link" type="button" aria-label="First page" [disabled]="page === 0">
+            <i class="fa-solid fa-angles-left" aria-hidden="true"></i>
+          </button>
         </li>
-      }
-      <li class="page-item">
-        <a
-          (click)="goToNextPage()"
-          class="page-link"
-          href="javascript:void(0)"
-          aria-label="Next"
-          [class.disabled]="isLastPage"
-        >
-          <i class="fa-solid fa-chevron-right"></i>
-        </a>
-      </li>
-      <li class="page-item">
-        <a
-          (click)="goToLastPage()"
-          class="page-link"
-          href="javascript:void(0)"
-          aria-label="Next"
-          [class.disabled]="isLastPage"
-        >
-          <i class="fa-solid fa-angles-right"></i>
-        </a>
-      </li>
-    </ul>
-  </nav>
-</div>
+        <li class="page-item">
+          <button (click)="goToPreviousPage()" class="page-link" type="button" aria-label="Previous page" [disabled]="page === 0">
+            <i class="fa-solid fa-angle-left" aria-hidden="true"></i>
+          </button>
+        </li>
+        @for (_ of [].constructor(bookResponse.totalPages); track $index) {
+          <li class="page-item">
+            <button (click)="gotToPage($index)" class="page-link" type="button" [class.active]="page === $index" [attr.aria-current]="page === $index ? 'page' : null">
+              {{ $index + 1 }}
+            </button>
+          </li>
+        }
+        <li class="page-item">
+          <button (click)="goToNextPage()" class="page-link" type="button" aria-label="Next page" [disabled]="isLastPage">
+            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+          </button>
+        </li>
+        <li class="page-item">
+          <button (click)="goToLastPage()" class="page-link" type="button" aria-label="Last page" [disabled]="isLastPage">
+            <i class="fa-solid fa-angles-right" aria-hidden="true"></i>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+} @else {
+  <div class="empty-state">
+    <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+    <h2>Your collection is empty</h2>
+    <p>Add a book to share it with the community.</p>
+    <a routerLink="/books/manage" class="btn btn-primary mt-3">Add your first book</a>
+  </div>
+}

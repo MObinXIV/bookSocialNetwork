@@ -1,7 +1,53 @@
-/* You can add global styles to this file, and also import other style files */
 @import "bootstrap/dist/css/bootstrap.min.css";
 @import "@fortawesome/fontawesome-free/css/all.min.css";
-.login-container{
-  width: 800px !important;
-  margin-top: 15%;
+
+:root {
+  color-scheme: light;
+  font-family: Inter, "Segoe UI", sans-serif;
+  background: #f5f8fb;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  color: #203246;
+  background: #f5f8fb;
+}
+
+button,
+a,
+input,
+textarea {
+  &:focus-visible {
+    outline: 3px solid rgb(36 167 233 / 45%);
+    outline-offset: 2px;
+  }
+}
+
+.login-container {
+  width: min(100% - 2rem, 560px);
+  margin: clamp(2rem, 10vh, 7rem) auto 2rem;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  border: 1px solid #e4eaf0;
+  border-radius: 1rem;
+  box-shadow: 0 0.75rem 2rem rgb(30 55 75 / 8%);
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+.pagination {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.2rem;
+}
+
+@media (max-width: 480px) {
+  .pagination .page-link {
+    padding: 0.45rem 0.6rem;
+  }
 }
