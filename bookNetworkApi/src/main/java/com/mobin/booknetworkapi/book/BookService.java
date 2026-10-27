@@ -31,8 +31,22 @@ public class BookService {
     private final FileStorageService fileStorageService;
     public Integer save(BookRequest request,Authentication connectedUser) {
         User user = ((User) connectedUser.getPrincipal());
-        Book book= bookMapper.toBook(request);
-        book.setOwner(user);// set the book to the current connected user
+        Book book;
+        if (request.id() == null) {
+            book = bookMapper.toBook(request);
+            book.setOwner(user);
+        } else {
+            book = bookRepository.findById(request.id())
+                    .orElseThrow(() -> new EntityNotFoundException("Book not found with ID: " + request.id()));
+            if (!Objects.equals(book.getOwner().getId(), user.getId())) {
+                throw new OperationNotPermittedException("You cannot update others' books");
+            }
+            book.setTitle(request.title());
+            book.setAuthorName(request.authorName());
+            book.setIsbn(request.isbn());
+            book.setSynopsis(request.synopsis());
+            book.setShareable(request.shareable());
+        }
         return bookRepository.save(book).getId();
     }
 
@@ -151,9 +165,8 @@ public class BookService {
         if(Objects.equals(book.getOwner().getId(), user.getId())) {
             throw new OperationNotPermittedException("You cannot borrow your own book");
         }
-        // check if the book is already borrowed or not
-        final boolean isAlreadyBorrowed = historyRepository.isAlreadyBorrowedByUser(bookId,user.getId());
-        if(isAlreadyBorrowed) {
+        // A book represents one physical copy, so it remains unavailable until its return is approved.
+        if (historyRepository.isCurrentlyBorrowed(bookId)) {
             throw new OperationNotPermittedException("The requested book is already borrowed");
         }
         BookTransactionHistory bookTransactionHistory = BookTransactionHistory.builder()
@@ -186,19 +199,17 @@ public class BookService {
     public Integer approveReturnBorrowedBook(Integer bookId, Authentication connectedUser) {
         Book book = bookRepository.findById(bookId).orElseThrow(()-> new EntityNotFoundException("Book not found with ID: "+bookId));
         User user = ((User) connectedUser.getPrincipal());
-        // let's check our bad scenarios
-        // case the book archived or not shared
-        if(book.isArchived() || !book.isShareable()){
-            throw new OperationNotPermittedException("You cannot borrow this book,since it is archived or not shareable");
+        if(!Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotPermittedException("You cannot approve the return of another owner's book");
         }
-        if(Objects.equals(book.getOwner().getId(), user.getId())) {
-            throw new OperationNotPermittedException("You cannot borrow or your own book");
+        List<BookTransactionHistory> pendingReturns = historyRepository.findAllByBookIdAndOwnerId(bookId, user.getId());
+        if (pendingReturns.isEmpty()) {
+            throw new OperationNotPermittedException("The book isn't returned yet, you can't approve its return");
         }
-        // check if the user 've even borrowed this book
-        BookTransactionHistory transactionHistory = historyRepository.findByBookIdAndOwnerId(bookId,user.getId())
-                .orElseThrow(()-> new OperationNotPermittedException("The book isn't returned yet, you can't approve its return"));
-        transactionHistory.setReturnApproved(true);
-        return historyRepository.save(transactionHistory).getId();
+
+        pendingReturns.forEach(history -> history.setReturnApproved(true));
+        historyRepository.saveAll(pendingReturns);
+        return pendingReturns.get(0).getId();
     }
 
     public void uploadBookCoverPicture(MultipartFile file, Authentication connectedUser, Integer bookId) {
