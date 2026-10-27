@@ -1,179 +1,166 @@
 # Book Social Network
 
-A full-stack social reading app where users can share their book collections, discover books from other readers, borrow and return books, and leave feedback.
+A full-stack book-sharing application for readers. Create a bookshelf, share books with the community, borrow books from other readers, manage returns, and leave feedback.
 
-This project combines a Java Spring Boot backend with an Angular frontend to create a complete book-sharing experience with JWT-based security, email verification, file uploads, and API-first documentation.
-
-## Overview
-
-Book Social Network is designed for readers who want to:
-
-- manage their own virtual bookshelf
-- share books they are willing to lend
-- borrow books from other users
-- track return workflow approvals
-- leave ratings and comments about books
-- verify accounts through email activation
+The project has an Angular web client and a Spring Boot REST API backed by PostgreSQL. Email-based account activation is available locally through MailDev.
 
 ## Features
 
-- User registration and account activation via email
-- Secure login with JWT authentication
-- Book creation and management
-- Cover image upload for books
-- Borrow and return flow with owner approval
-- Returned and borrowed book tracking
-- Book feedback and rating collection
-- Paginated browsing of books and user activity
-- Swagger/OpenAPI API documentation
+- Register an account, activate it by email, and sign in with JWT authentication
+- Add and manage books, including uploading cover images
+- Browse books shared by other readers
+- Borrow books and track borrowed and returned books
+- Request a return and let the book owner approve it
+- Leave feedback on books
+- Browse books and feedback using paginated API endpoints
+- Explore the REST API through Swagger UI
 
-## Tech Stack
+## Technology
 
-### Backend
-- Java 21
-- Spring Boot 4
-- Spring Security
-- Spring Data JPA
-- PostgreSQL
-- JWT for authentication
-- Spring Mail + MailDev for email testing
-- OpenAPI / Swagger documentation
+| Area | Technologies |
+| --- | --- |
+| Frontend | Angular 20, TypeScript, Bootstrap, RxJS |
+| Backend | Java 21, Spring Boot, Spring Security, Spring Data JPA |
+| Database | PostgreSQL |
+| Authentication | JWT |
+| Local email | Spring Mail and MailDev |
+| API documentation | OpenAPI / Swagger UI |
 
-### Frontend
-- Angular 20
-- Bootstrap
-- Font Awesome
-- RxJS
-
-### Local infrastructure
-- Docker Compose
-- PostgreSQL container
-- MailDev container
-
-## Architecture
-
-The project is split into two main applications:
-
-- `bookNetworkApi/` — Spring Boot REST API and business logic
-- `book-network-ui/` — Angular client application
-
-Supporting local services:
-
-- `docker-compose.yml` — PostgreSQL and MailDev
-- `openapi/openapi.json` — generated API contract used by the frontend
-- `uploads/` — uploaded book cover images
-
-## Project Structure
+## Project layout
 
 ```text
-bookSocialNetwork/
-├── bookNetworkApi/               # Spring Boot backend
-│   ├── src/main/java/            # application source code
-│   ├── src/main/resources/       # config and templates
-│   ├── pom.xml                  # Maven dependencies and build
-│   └── mvnw                     # Maven wrapper
-├── book-network-ui/              # Angular frontend
-│   ├── src/                     # app source
-│   ├── package.json             # npm scripts and dependencies
-│   └── README.md               # frontend-specific docs
-├── docker-compose.yml           # local PostgreSQL + MailDev setup
-├── openapi/                     # generated OpenAPI JSON
-├── uploads/                     # uploaded files
-├── readme.md                    # project overview
-└── .gitignore
+.
+├── book-network-ui/       # Angular application
+├── bookNetworkApi/        # Spring Boot REST API
+├── openapi/openapi.json   # OpenAPI document used to generate the Angular API client
+├── uploads/               # Uploaded files (created/used by the backend)
+└── docker-compose.yml     # Local PostgreSQL and MailDev services
 ```
 
-## Prerequisites
+## Requirements
 
-Before you run the project locally, make sure you have:
+- Java 21
+- Node.js and npm (use a Node.js release supported by Angular 20)
+- Docker Desktop or Docker Engine with Docker Compose
 
-- Java 21+
-- Maven or the included Maven wrapper
-- Node.js 20+
-- npm
-- Docker Desktop or Docker Engine
+The backend includes a Maven wrapper, so a separate Maven installation is not required.
 
-## Getting Started
+## Run locally
 
-### 1. Clone the repository
+Run each command from the repository root unless it says otherwise.
 
-```bash
-git clone https://github.com/MObinXIV/bookSocialNetwork.git
-cd bookSocialNetwork
-```
+### 1. Start PostgreSQL and MailDev
 
-### 2. Start the local infrastructure
-
-This starts PostgreSQL and MailDev:
-
-```bash
+```powershell
 docker compose up -d
 ```
 
-Services:
+The Compose file exposes:
 
-- PostgreSQL: `localhost:5433`
-- MailDev UI: `http://localhost:1080`
-- MailDev SMTP: `localhost:1025`
+| Service | Local address |
+| --- | --- |
+| PostgreSQL | `localhost:5433` |
+| MailDev web inbox | `http://localhost:1080` |
+| MailDev SMTP | `localhost:1025` |
 
-### 3. Run the backend API
+The development Spring profile connects to this PostgreSQL instance and sends mail to MailDev.
 
-```bash
-cd bookNetworkApi
-./mvnw spring-boot:run
-```
-
-The API will start with the default application configuration and expose Swagger UI at:
-
-```text
-http://localhost:8080/api/v1/swagger-ui/index.html
-```
-
-The backend uses the PostgreSQL database configured in `application-dev.yml`, so the container started by Docker must be running first.
-
-### 4. Run the frontend
+### 2. Start the API
 
 In a new terminal:
 
-```bash
+```powershell
+cd bookNetworkApi
+.\mvnw.cmd spring-boot:run
+```
+
+The API base URL is `http://localhost:8080/api/v1`. Swagger UI is available at [http://localhost:8080/api/v1/swagger-ui/index.html](http://localhost:8080/api/v1/swagger-ui/index.html).
+
+### 3. Start the web app
+
+In another terminal:
+
+```powershell
 cd book-network-ui
 npm install
 npm start
 ```
 
-Then open:
+Open [http://localhost:4200](http://localhost:4200).
 
-```text
-http://localhost:4200
+### 4. Activate your account
+
+1. Register from the web app.
+2. Open the MailDev inbox at [http://localhost:1080](http://localhost:1080).
+3. Open the activation email and follow its link.
+4. Sign in, then add a book and mark it as shareable to make it available to other readers.
+
+## Configuration
+
+Local development settings are in:
+
+- `bookNetworkApi/src/main/resources/application.yml` — active profile, API context path, and upload size limit
+- `bookNetworkApi/src/main/resources/application-dev.yml` — PostgreSQL, MailDev, JWT, activation URL, and upload directory
+- `book-network-ui/src/app/services/api-configuration.ts` — frontend API base URL
+
+The checked-in settings target local development services. Replace development credentials and secrets, and configure appropriate URLs and security settings, before deploying this application outside a local environment.
+
+## API overview
+
+The API is rooted at `/api/v1` and includes:
+
+| Resource | Examples |
+| --- | --- |
+| Authentication | `POST /auth/register`, `POST /auth/login`, `GET /auth/activate-account` |
+| Books | `GET /books`, `POST /books`, `POST /books/borrow/{book-id}`, return and sharing operations |
+| Feedback | `POST /feedbacks`, `GET /feedbacks/book/{book-id}` |
+
+See Swagger UI for request and response schemas, parameters, and the complete endpoint list.
+
+## Development
+
+### Run backend tests
+
+From `bookNetworkApi/`:
+
+```powershell
+.\mvnw.cmd test
 ```
 
-## Default Local URLs
+### Build the frontend
 
-- Frontend: `http://localhost:4200`
-- API: `http://localhost:8080/api/v1`
-- Swagger UI: `http://localhost:8080/api/v1/swagger-ui/index.html`
-- MailDev UI: `http://localhost:1080`
+From `book-network-ui/`:
 
-## Key API Areas
+```powershell
+npm run build
+```
 
-The backend exposes endpoints for:
+### Run frontend unit tests
 
-- `auth` — registration, login, account activation
-- `books` — book CRUD, sharing, borrowing, return flow, cover uploads
-- `feedbacks` — book feedback and ratings
+From `book-network-ui/`:
 
-## Development Notes
+```powershell
+npm test
+```
 
-- The frontend uses generated OpenAPI client code in `book-network-ui/src/app/services`.
-- The backend stores uploaded book photos under `uploads/`.
-- Email activation links are configured to point to the Angular frontend route for account activation.
-- The project is a good example of integrating a Spring Security JWT API with a modern Angular application.
+### Regenerate the Angular API client
 
-## Status
+The client is generated from `openapi/openapi.json`. From `book-network-ui/`:
 
-The project is a working learning/demo application with the core social-book flow implemented. The backend covers authentication, book ownership, borrowing, return handling, and feedback. The Angular app continues to evolve as the frontend experience is refined.
+```powershell
+npm run api-gen
+```
+
+Update the OpenAPI document before regenerating if the backend API contract has changed.
+
+## Stopping local services
+
+From the repository root:
+
+```powershell
+docker compose down
+```
 
 ## License
 
-This project does not currently include a license file. If you plan to share or publish it, add an appropriate license before distribution.
-
+No license file is currently included. Add a license before redistributing this project.

@@ -1,0 +1,265 @@
+.borrowed-books-page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: clamp(0.25rem, 2vw, 1rem) 0;
+}
+
+.page-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+
+  h1 {
+    margin-bottom: 0.35rem;
+    color: #203246;
+    font-size: clamp(1.7rem, 3vw, 2.25rem);
+    font-weight: 700;
+  }
+}
+
+.eyebrow {
+  margin-bottom: 0.45rem;
+  color: #52758b;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.refresh-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.borrowed-book-list {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.borrowed-book-card {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: clamp(1rem, 2vw, 1.35rem);
+  border: 1px solid #e2eaf0;
+  border-radius: 0.9rem;
+  background: #fff;
+  box-shadow: 0 0.35rem 1.1rem rgb(30 55 75 / 4%);
+}
+
+.book-symbol {
+  display: grid;
+  width: 58px;
+  height: 68px;
+  place-items: center;
+  border-radius: 0.65rem;
+  color: #27749d;
+  background: #eaf4f9;
+  font-size: 1.45rem;
+}
+
+.book-information {
+  min-width: 0;
+}
+
+.book-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+
+  h2 {
+    margin: 0;
+    color: #203246;
+    font-size: 1.05rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+}
+
+.book-author {
+  margin: 0.35rem 0;
+  color: #607486;
+}
+
+.book-isbn,
+.book-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.2rem 0.8rem 0 0;
+  color: #687989;
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+
+  span:first-child {
+    font-weight: 600;
+  }
+}
+
+.book-rating i {
+  color: #e3a92d;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+
+  &.status-borrowed {
+    color: #2b6080;
+    background: #e9f3f9;
+  }
+
+  &.status-pending {
+    color: #865d20;
+    background: #fff3db;
+  }
+
+  &.status-complete {
+    color: #276447;
+    background: #e7f5ed;
+  }
+}
+
+.book-action {
+  display: flex;
+  justify-content: flex-end;
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 42px;
+    white-space: nowrap;
+  }
+}
+
+.waiting-note,
+.complete-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #846128;
+  font-size: 0.86rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.complete-note {
+  color: #276447;
+}
+
+.state-panel {
+  display: flex;
+  min-height: 260px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 2rem 1rem;
+  border: 1px dashed #cbd8e2;
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 70%);
+  text-align: center;
+
+  > i {
+    color: #6c9db8;
+    font-size: 2.1rem;
+  }
+
+  h2 {
+    margin: 0;
+    color: #203246;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  p {
+    max-width: 440px;
+    margin: 0;
+    color: #687989;
+  }
+}
+
+.error-state > i {
+  color: #c34d4d;
+}
+
+.refreshing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: -0.75rem 0 0.75rem;
+  color: #607486;
+  font-size: 0.85rem;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.page-summary {
+  color: #687989;
+  font-size: 0.88rem;
+}
+
+@media (max-width: 640px) {
+  .borrowed-book-card {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 0.8rem;
+  }
+
+  .book-symbol {
+    width: 48px;
+    height: 58px;
+  }
+
+  .book-action {
+    grid-column: 2;
+    justify-content: flex-start;
+  }
+
+  .pagination-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pagination-container nav,
+  .pagination {
+    width: 100%;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 420px) {
+  .page-heading {
+    align-items: flex-start;
+  }
+
+  .refresh-button span {
+    display: none;
+  }
+
+  .book-title-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+}

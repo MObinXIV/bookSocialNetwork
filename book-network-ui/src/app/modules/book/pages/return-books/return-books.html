@@ -1,0 +1,198 @@
+<section class="returned-books-page">
+  <header class="page-heading">
+    <div>
+      <p class="eyebrow">YOUR SHARED LIBRARY</p>
+      <h1>Returned books</h1>
+      <p class="text-secondary mb-0">Review returned books and confirm when they are back with you.</p>
+    </div>
+    <button
+      type="button"
+      class="btn btn-outline-primary refresh-button"
+      (click)="loadReturnedBooks()"
+      [disabled]="isLoading"
+    >
+      <i class="fa-solid fa-rotate" [class.fa-spin]="isLoading" aria-hidden="true"></i>
+      <span>Refresh</span>
+    </button>
+  </header>
+
+  @if (message) {
+    <div
+      class="alert"
+      [class.alert-success]="messageLevel === 'success'"
+      [class.alert-danger]="messageLevel === 'error'"
+      role="status"
+    >
+      {{ message }}
+    </div>
+  }
+
+  @if (isLoading && !books.length) {
+    <div class="state-panel" role="status">
+      <span class="spinner-border text-primary" aria-hidden="true"></span>
+      <span>Loading returned books…</span>
+    </div>
+  } @else if (loadError && !books.length) {
+    <div class="state-panel error-state" role="alert">
+      <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+      <h2>We couldn't load returned books</h2>
+      <p>{{ loadError }}</p>
+      <button type="button" class="btn btn-primary" (click)="loadReturnedBooks()">Try again</button>
+    </div>
+  } @else if (!books.length) {
+    <div class="state-panel empty-state">
+      <i class="fa-solid fa-box-open" aria-hidden="true"></i>
+      <h2>No borrowed books to review</h2>
+      <p>When someone borrows one of your books, its return status will appear here.</p>
+      <a class="btn btn-primary" routerLink="/books/my-books">View my books</a>
+    </div>
+  } @else {
+    @if (isLoading) {
+      <div class="refreshing-indicator" role="status">
+        <span class="spinner-border spinner-border-sm text-primary" aria-hidden="true"></span>
+        <span>Updating your list…</span>
+      </div>
+    }
+    @if (loadError) {
+      <div class="alert alert-danger" role="alert">{{ loadError }}</div>
+    }
+
+    <div class="returned-book-list">
+      @for (book of books; track book.id) {
+        <article class="returned-book-card">
+          <div class="book-symbol" aria-hidden="true">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <div class="book-information">
+            <div class="book-title-row">
+              <h2>{{ book.title || 'Untitled book' }}</h2>
+              <span
+                class="status-badge"
+                [class.status-borrowed]="!book.returned && !book.returnApproved"
+                [class.status-pending]="book.returned && !book.returnApproved"
+                [class.status-complete]="book.returnApproved"
+              >
+                @if (book.returnApproved) {
+                  Return approved
+                } @else if (book.returned) {
+                  Awaiting your approval
+                } @else {
+                  Borrowed
+                }
+              </span>
+            </div>
+            <p class="book-author">{{ book.authorName || 'Unknown author' }}</p>
+            @if (book.isbn) {
+              <p class="book-isbn"><span>ISBN</span> {{ book.isbn }}</p>
+            }
+            @if ((book.rate || 0) > 0) {
+              <p class="book-rating">
+                <i class="fa-solid fa-star" aria-hidden="true"></i>
+                <span>{{ book.rate }} / 5</span>
+              </p>
+            }
+          </div>
+          <div class="book-action">
+            @if (book.returned && !book.returnApproved) {
+              <button
+                type="button"
+                class="btn btn-primary"
+                (click)="approveReturn(book)"
+                [disabled]="pendingBookId !== null"
+              >
+                @if (pendingBookId === book.id) {
+                  <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                  <span>Approving…</span>
+                } @else {
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>Approve return</span>
+                }
+              </button>
+            } @else if (book.returnApproved) {
+              <span class="complete-note">
+                <i class="fa-solid fa-circle-check" aria-hidden="true"></i> Return complete
+              </span>
+            } @else {
+              <span class="waiting-note">
+                <i class="fa-regular fa-clock" aria-hidden="true"></i> With borrower
+              </span>
+            }
+          </div>
+        </article>
+      }
+    </div>
+
+    @if (totalPages > 1) {
+      <div class="pagination-container">
+        <span class="page-summary">
+          Page {{ page + 1 }} of {{ totalPages }}
+          @if (returnedBooks.totalElements !== undefined) {
+            <span> · {{ returnedBooks.totalElements }} books</span>
+          }
+        </span>
+        <nav aria-label="Returned books pages">
+          <ul class="pagination mb-0">
+            <li class="page-item">
+              <button
+                type="button"
+                class="page-link"
+                aria-label="First page"
+                (click)="goToFirstPage()"
+                [disabled]="page === 0 || isLoading"
+              >
+                <i class="fa-solid fa-angles-left" aria-hidden="true"></i>
+              </button>
+            </li>
+            <li class="page-item">
+              <button
+                type="button"
+                class="page-link"
+                aria-label="Previous page"
+                (click)="goToPreviousPage()"
+                [disabled]="page === 0 || isLoading"
+              >
+                <i class="fa-solid fa-angle-left" aria-hidden="true"></i>
+              </button>
+            </li>
+            @for (_ of [].constructor(totalPages); track $index) {
+              <li class="page-item">
+                <button
+                  type="button"
+                  class="page-link"
+                  (click)="goToPage($index)"
+                  [class.active]="page === $index"
+                  [attr.aria-current]="page === $index ? 'page' : null"
+                  [disabled]="isLoading"
+                >
+                  {{ $index + 1 }}
+                </button>
+              </li>
+            }
+            <li class="page-item">
+              <button
+                type="button"
+                class="page-link"
+                aria-label="Next page"
+                (click)="goToNextPage()"
+                [disabled]="isLastPage || isLoading"
+              >
+                <i class="fa-solid fa-angle-right" aria-hidden="true"></i>
+              </button>
+            </li>
+            <li class="page-item">
+              <button
+                type="button"
+                class="page-link"
+                aria-label="Last page"
+                (click)="goToLastPage()"
+                [disabled]="isLastPage || isLoading"
+              >
+                <i class="fa-solid fa-angles-right" aria-hidden="true"></i>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    }
+  }
+</section>

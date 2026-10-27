@@ -1,0 +1,140 @@
+<section class="book-details-page">
+  <a class="back-link" routerLink="/books">
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    <span>Back to discover</span>
+  </a>
+
+  @if (isLoadingBook) {
+    <div class="state-panel" role="status">
+      <span class="spinner-border text-primary" aria-hidden="true"></span>
+      <span>Loading book details…</span>
+    </div>
+  } @else if (bookError || !book) {
+    <div class="state-panel error-state" role="alert">
+      <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+      <h1>Book details unavailable</h1>
+      <p>{{ bookError || 'This book could not be found.' }}</p>
+      <button type="button" class="btn btn-primary" (click)="loadBook()">Try again</button>
+    </div>
+  } @else {
+    <article class="book-overview">
+      <img class="book-cover" [src]="cover" [alt]="'Cover of ' + (book.title || 'book')">
+      <div class="book-copy">
+        <p class="eyebrow">COMMUNITY LIBRARY</p>
+        <h1>{{ book.title || 'Untitled book' }}</h1>
+        <p class="author">{{ book.authorName || 'Unknown author' }}</p>
+        @if (book.owner) {
+          <p class="owner">Shared by {{ book.owner }}</p>
+        }
+        @if (book.isbn) {
+          <p class="isbn"><span>ISBN</span> {{ book.isbn }}</p>
+        }
+        <div class="rating-summary">
+          <app-rating [rating]="book.rate || 0"></app-rating>
+          <span>{{ book.rate || 0 }} / 5</span>
+        </div>
+        <p class="synopsis">{{ book.synopsis || 'No description has been added for this book.' }}</p>
+      </div>
+    </article>
+
+    <section class="feedback-section" aria-labelledby="feedback-heading">
+      <header>
+        <div>
+          <p class="eyebrow">READER REVIEWS</p>
+          <h2 id="feedback-heading">Feedback</h2>
+        </div>
+      </header>
+
+      @if (feedbackMessage) {
+        <div
+          class="alert"
+          [class.alert-success]="feedbackMessageLevel === 'success'"
+          [class.alert-danger]="feedbackMessageLevel === 'error'"
+          role="status"
+        >{{ feedbackMessage }}</div>
+      }
+
+      <form class="feedback-form" (ngSubmit)="submitFeedback()">
+        <label for="feedback-rating" class="form-label">Your rating</label>
+        <select id="feedback-rating" name="note" class="form-select rating-select" [(ngModel)]="note">
+          <option [ngValue]="5">5 — Excellent</option>
+          <option [ngValue]="4">4 — Very good</option>
+          <option [ngValue]="3">3 — Good</option>
+          <option [ngValue]="2">2 — Fair</option>
+          <option [ngValue]="1">1 — Poor</option>
+        </select>
+
+        <label for="feedback-comment" class="form-label">Your review</label>
+        <textarea
+          id="feedback-comment"
+          name="comment"
+          class="form-control"
+          rows="4"
+          maxlength="255"
+          required
+          [(ngModel)]="comment"
+          placeholder="Share what you thought about this book"
+        ></textarea>
+        <div class="form-actions">
+          <span>{{ comment.length }} / 255</span>
+          <button type="submit" class="btn btn-primary" [disabled]="isSubmitting || !comment.trim()">
+            @if (isSubmitting) {
+              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              <span>Submitting…</span>
+            } @else {
+              <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+              <span>Submit feedback</span>
+            }
+          </button>
+        </div>
+      </form>
+
+      @if (isLoadingFeedback && !feedback.length) {
+        <div class="feedback-state" role="status">
+          <span class="spinner-border spinner-border-sm text-primary" aria-hidden="true"></span>
+          <span>Loading reader feedback…</span>
+        </div>
+      } @else if (feedbackError && !feedback.length) {
+        <div class="feedback-state error-state" role="alert">
+          <p>{{ feedbackError }}</p>
+          <button type="button" class="btn btn-outline-primary" (click)="loadFeedback()">Try again</button>
+        </div>
+      } @else if (feedback.length) {
+        @if (feedbackError) {
+          <div class="alert alert-danger" role="alert">{{ feedbackError }}</div>
+        }
+        <div class="feedback-list">
+          @for (item of feedback; track $index) {
+            <article class="feedback-card">
+              <div class="feedback-heading">
+                <app-rating [rating]="item.note || 0"></app-rating>
+                @if (item.ownFeedback) {
+                  <span class="own-feedback">Your feedback</span>
+                } @else {
+                  <span class="own-feedback">Community review</span>
+                }
+              </div>
+              <p>{{ item.comment }}</p>
+            </article>
+          }
+        </div>
+        @if (totalPages > 1) {
+          <nav class="feedback-pagination" aria-label="Feedback pages">
+            <button type="button" class="btn btn-outline-primary" (click)="goToPage(page - 1)" [disabled]="page === 0 || isLoadingFeedback">
+              Previous
+            </button>
+            <span>Page {{ page + 1 }} of {{ totalPages }}</span>
+            <button type="button" class="btn btn-outline-primary" (click)="goToPage(page + 1)" [disabled]="isLastPage || isLoadingFeedback">
+              Next
+            </button>
+          </nav>
+        }
+      } @else {
+        <div class="feedback-state">
+          <i class="fa-regular fa-comment-dots" aria-hidden="true"></i>
+          <p>No feedback yet. Be the first to share your thoughts.</p>
+        </div>
+      }
+    </section>
+  }
+</section>
